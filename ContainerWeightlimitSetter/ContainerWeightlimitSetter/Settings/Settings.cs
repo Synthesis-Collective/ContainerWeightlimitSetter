@@ -20,6 +20,7 @@ namespace ContainerWeightlimitSetter.Settings
         [SynthesisTooltip("Containers that will be ignored by the patcher.")]
         public HashSet<IFormLinkGetter<IContainerGetter>> IgnoredContainers = new()
         {
+            /*
             Skyrim.Container.EvidenceChestPlayerInventory,
             HearthFires.Container.BYOHHouseVendorChestSmall,
             HearthFires.Container.BYOHHouseVendorChest,
@@ -46,6 +47,7 @@ namespace ContainerWeightlimitSetter.Settings
             HearthFires.Container.TreasSatchelEMPTY,
             HearthFires.Container.BYOHUrchin_SofieChest,
             HearthFires.Container.BYOHHouseCraftingChest
+            */
         };
         [MaintainOrder]
         [SynthesisDescription("Settings for Handling Container Weights that can't be dynamically determined.")]
