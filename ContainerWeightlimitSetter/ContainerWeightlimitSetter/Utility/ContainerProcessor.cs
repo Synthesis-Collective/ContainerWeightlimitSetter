@@ -14,6 +14,8 @@ public class ContainerProcessor
     {
         if (container.Items == null || container.Items.Count == 0) return GetContainerClassWeight(container);
         
+        //TODO: IMPLEMENT CONTAINER LOOT BASED WEIGHT LIMIT GENERATION
+        
         return 42;
     }
     

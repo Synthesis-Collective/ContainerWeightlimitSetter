@@ -41,6 +41,8 @@ namespace ContainerWeightlimitSetter
             SkseExports skseExports = new();
             ContainerProcessor containerProcessor = new();
             
+            //TODO: Evaluate the exclusion of containers that are not referenced in other records (since they could possibly be accessed by scripts)
+            
             state.PatchMod.Containers.Set(
                 state.LoadOrder.PriorityOrder.Container().WinningOverrides()
                 .Where(container => container is {EditorID: not null, Weight: 0}
@@ -55,8 +57,6 @@ namespace ContainerWeightlimitSetter
                 .Select(container => container.DeepCopy())
                 .Do(container =>
                 {
-                    //TODO: IMPLEMENT CONTAINER LOOT BASED WEIGHT LIMIT GENERATION
-                    
                     container.Weight = containerProcessor.EstimateWeight(container);
                     Console.WriteLine($"Setting weight of {container.EditorID} to {container.Weight}");
                 })
