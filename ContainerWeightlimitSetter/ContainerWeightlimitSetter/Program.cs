@@ -7,6 +7,7 @@ using Mutagen.Bethesda.Plugins.Cache.Internals.Implementations;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Synthesis;
 using Newtonsoft.Json;
+using Noggog;
 
 namespace ContainerWeightlimitSetter
 {
@@ -49,6 +50,11 @@ namespace ContainerWeightlimitSetter
             ContainerProcessor containerProcessor = new(state.LinkCache);
             
             //TODO: Evaluate the exclusion of containers that are not referenced in other records (since they could possibly be accessed by scripts)
+
+            var merchantFactions = state.LoadOrder.PriorityOrder.Faction().WinningOverrides()
+                .Where(faction => !faction.MerchantContainer.IsNull).ToHashSet();
+            
+            var merchantContainers = containerProcessor.GetMerchantContainerFormKeys(merchantFactions,state.LinkCache);
             
             state.PatchMod.Containers.Set(
                 state.LoadOrder.PriorityOrder.Container().WinningOverrides()
@@ -58,6 +64,7 @@ namespace ContainerWeightlimitSetter
                                         .Contains(VendorChestMarker, StringComparison.OrdinalIgnoreCase)
                                     && !container.EditorID
                                         .Contains(MerchantChestMarker, StringComparison.OrdinalIgnoreCase)
+                                    && !merchantContainers.Contains(container.FormKey)
                                     && !skseExports.ExportedIgnoredContainerEditorId(container)
                                     && (container.VirtualMachineAdapter?.Scripts.Count ?? 0) == 0 
                                     )
@@ -80,11 +87,12 @@ namespace ContainerWeightlimitSetter
 
             var maxGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Max(entry => entry.Value);
             var minGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Min(entry => entry.Value);
-            var averageGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Average(entry => entry.Value);
+            var averageGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Average(entry => entry.Value).Round();
             Console.WriteLine($"Max Generated Weight: {maxGeneratedWeight}");
             Console.WriteLine($"Min Generated Weight: {minGeneratedWeight}");
             Console.WriteLine($"Average Generated Weight: {averageGeneratedWeight}");
 
         }
+
     }
 }

@@ -13,14 +13,14 @@ public class ContainerWeightSettings
     [MaintainOrder]
     [SynthesisDescription("Default Weight for Containers that start empty.")]
     [SynthesisTooltip("Default Weight for Containers that start empty.")]
-    public float DefaultFallbackWeight = 600;
+    public float DefaultFallbackWeight = 150;
         
-    public float SmallContainerWeight = 150;
+    public float SmallContainerWeight = 100;
     public HashSet<IFormLinkGetter<IContainerGetter>> SmallContainers = new ();
         
-    public float MediumContainerWeight = 600;
+    public float MediumContainerWeight = 300;
     public HashSet<IFormLinkGetter<IContainerGetter>> MediumContainers = new();
         
-    public float LargeContainerWeight = 900;
+    public float LargeContainerWeight = 1200;
     public HashSet<IFormLinkGetter<IContainerGetter>> LargeContainers = new();
 }

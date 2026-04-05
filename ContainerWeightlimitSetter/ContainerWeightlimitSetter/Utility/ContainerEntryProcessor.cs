@@ -20,7 +20,7 @@ public class ContainerEntryProcessor(ILinkCache linkCache)
             return leveledItemGetter.Entries.Max(leveledItemEntry =>
             {
                 var leveledListMaxWeight = leveledItemEntry.Data == null ? 0f :  GetItemWeight(leveledItemEntry.Data.Reference.FormKey);
-                ContainerItemMaxWeightCache[entryPointFormKey] = leveledListMaxWeight;
+                if (leveledItemEntry.Data != null) ContainerItemMaxWeightCache[leveledItemEntry.Data.Reference.FormKey] = leveledListMaxWeight;
                 return leveledListMaxWeight;
             });
         }
@@ -70,6 +70,12 @@ public class ContainerEntryProcessor(ILinkCache linkCache)
         {
             ContainerItemMaxWeightCache[itemFormKey] = keyGetter.Weight;
             return keyGetter.Weight;
+        }
+
+        if (linkCache.TryResolve<ILightGetter>(itemFormKey, out var lightGetter))
+        {
+            ContainerItemMaxWeightCache[itemFormKey] = lightGetter.Weight;
+            return lightGetter.Weight;
         }
 
         if (linkCache.TryResolve<IMiscItemGetter>(itemFormKey, out var miscItemGetter))

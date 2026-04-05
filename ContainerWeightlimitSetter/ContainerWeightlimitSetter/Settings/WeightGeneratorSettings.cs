@@ -11,5 +11,6 @@ namespace ContainerWeightlimitSetter.Settings;
 public class WeightGeneratorSettings
 {
     public WeightGenerationMode WeightGenerationMode = WeightGenerationMode.MaxWeightMultipliedByFactor;
-    public float Factor = 0.5f;
+    public float Factor = 2.2f;
+    public float MinWeight = 60f;
 }
