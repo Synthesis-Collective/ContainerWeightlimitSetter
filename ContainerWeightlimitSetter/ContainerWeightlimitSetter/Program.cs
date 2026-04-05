@@ -1,6 +1,9 @@
+using ContainerWeightlimitSetter.Settings;
 using ContainerWeightlimitSetter.Utility;
 using Mutagen.Bethesda;
+using Mutagen.Bethesda.Json;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache.Internals.Implementations;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Synthesis;
 using Newtonsoft.Json;
@@ -13,17 +16,22 @@ namespace ContainerWeightlimitSetter
         private static Lazy<Settings.Settings> _lazySettings = null!;
         private static Settings.Settings Settings => _lazySettings.Value;
 
+        public static JsonSerializerSettings JsonSerializerSettings = new();
+
         private const string QaContainerMarker = "QA";
         private const string VendorChestMarker = "Vendor";
         private const string MerchantChestMarker = "Merchant";
         
         public static Settings.ContainerWeightSettings ContainerWeightSettings => Settings.ContainerWeightSettings;
+        
+        public static WeightGeneratorSettings WeightGeneratorSettings => Settings.WeightGeneratorSettings;
 
         public static HashSet<IFormLinkGetter<IContainerGetter>>  IgnoredContainers => Settings.IgnoredContainers;
-
-       
+        
         public static async Task<int> Main(string[] args)
         {
+            
+            JsonSerializerSettings.AddMutagenConverters();
             
             return await SynthesisPipeline.Instance
                 .AddPatch<ISkyrimMod, ISkyrimModGetter>(RunPatch)
@@ -37,9 +45,8 @@ namespace ContainerWeightlimitSetter
 
         public static void RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state)
         {
-            
             SkseExports skseExports = new();
-            ContainerProcessor containerProcessor = new();
+            ContainerProcessor containerProcessor = new(state.LinkCache);
             
             //TODO: Evaluate the exclusion of containers that are not referenced in other records (since they could possibly be accessed by scripts)
             
@@ -58,7 +65,6 @@ namespace ContainerWeightlimitSetter
                 .Do(container =>
                 {
                     container.Weight = containerProcessor.EstimateWeight(container);
-                    Console.WriteLine($"Setting weight of {container.EditorID} to {container.Weight}");
                 })
             );
             
@@ -67,10 +73,18 @@ namespace ContainerWeightlimitSetter
             
             var staticallyProcessedContainers
                 = JsonConvert.SerializeObject(containerProcessor,Formatting.Indented);
+
             //TODO: Implement JSON Export for SKSE Plugin
             Console.WriteLine(skseExportsJson);
             Console.WriteLine(staticallyProcessedContainers);
-            
+
+            var maxGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Max(entry => entry.Value);
+            var minGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Min(entry => entry.Value);
+            var averageGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Average(entry => entry.Value);
+            Console.WriteLine($"Max Generated Weight: {maxGeneratedWeight}");
+            Console.WriteLine($"Min Generated Weight: {minGeneratedWeight}");
+            Console.WriteLine($"Average Generated Weight: {averageGeneratedWeight}");
+
         }
     }
 }

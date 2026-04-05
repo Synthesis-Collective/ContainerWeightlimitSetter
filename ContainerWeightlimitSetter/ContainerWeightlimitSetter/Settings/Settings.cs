@@ -12,9 +12,17 @@ namespace ContainerWeightlimitSetter.Settings
 {
     public class Settings
     {
-     
-        //TODO: Talk about splitting this because of slots patcher compatibility or removing the Hearthfire Containers
+
+        [MaintainOrder]
+        [SynthesisDescription("Settings for Handling Container Weights that can't be dynamically determined.")]
+        [SynthesisTooltip("Settings for Handling Container Weights that can't be dynamically determined.")]
+        public ContainerWeightSettings ContainerWeightSettings = new();
         
+        [MaintainOrder]
+        [SynthesisDescription("Settings for Generating Weights for prefilled Containers.")]
+        [SynthesisTooltip("Settings for Generating Weights for prefilled Containers.")]
+        public WeightGeneratorSettings WeightGeneratorSettings = new();
+
         [MaintainOrder]
         [SynthesisDescription("Containers that will be ignored by the patcher.")]
         [SynthesisTooltip("Containers that will be ignored by the patcher.")]
@@ -49,10 +57,6 @@ namespace ContainerWeightlimitSetter.Settings
             HearthFires.Container.BYOHHouseCraftingChest
             */
         };
-        [MaintainOrder]
-        [SynthesisDescription("Settings for Handling Container Weights that can't be dynamically determined.")]
-        [SynthesisTooltip("Settings for Handling Container Weights that can't be dynamically determined.")]
-        public ContainerWeightSettings ContainerWeightSettings = new();
 
     }
 

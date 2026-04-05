@@ -1,5 +1,7 @@
 ﻿using Mutagen.Bethesda;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
+using ContainerWeightlimitSetter.Settings.Enums;
 
 namespace ContainerWeightlimitSetter.Utility;
 
@@ -10,13 +12,43 @@ public class ContainerProcessor
     public HashSet<string> MediumContainers = [];
     public HashSet<string> LargeContainers = [];
     
+    public Dictionary<string, float> ContainerMaxWeightDictionary = new ();
+    
+    private ContainerEntryProcessor ContainerEntryProcessor;
+    
+    
+
+    public ContainerProcessor(ILinkCache linkCache)
+    {
+        ContainerEntryProcessor = new (linkCache);
+    }
+
+    
+    
     public float EstimateWeight(IContainerGetter container)
     {
         if (container.Items == null || container.Items.Count == 0) return GetContainerClassWeight(container);
         
-        //TODO: IMPLEMENT CONTAINER LOOT BASED WEIGHT LIMIT GENERATION
+        var maxContainerWeight =  container.Items.Sum(entry => ContainerEntryProcessor.GetMaxEntryWeight(entry));
+
+        var returnContainerWeight = maxContainerWeight;
         
-        return 42;
+        switch (Program.WeightGeneratorSettings.WeightGenerationMode)
+        {
+            case WeightGenerationMode.AddMaxWeightMultipliedByFactorToMaxWeight:
+                returnContainerWeight += maxContainerWeight * Program.WeightGeneratorSettings.Factor;
+                break;
+            case WeightGenerationMode.MaxWeightMultipliedByFactor:
+                returnContainerWeight *= Program.WeightGeneratorSettings.Factor;
+                break;
+            default:
+                Console.WriteLine($"Unknown WeightGenerationMode: {Program.WeightGeneratorSettings.WeightGenerationMode}");
+                return 0f;
+        }
+        
+        if (container.EditorID != null) ContainerMaxWeightDictionary[container.EditorID] = returnContainerWeight;
+        
+        return returnContainerWeight;
     }
     
     private float GetContainerClassWeight(IContainerGetter container)
