@@ -1,8 +1,4 @@
 ﻿using ContainerWeightlimitSetter.Settings.Enums;
-using Mutagen.Bethesda.Plugins;
-using Mutagen.Bethesda.Skyrim;
-using Mutagen.Bethesda.Synthesis.Settings;
-using Mutagen.Bethesda.WPF.Reflection.Attributes;
 
 // ReSharper disable FieldCanBeMadeReadOnly.Global
 

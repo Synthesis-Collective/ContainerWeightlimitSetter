@@ -3,7 +3,6 @@ using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using ContainerWeightlimitSetter.Settings.Enums;
 using Mutagen.Bethesda.Plugins;
-using Noggog;
 
 namespace ContainerWeightlimitSetter.Utility;
 
