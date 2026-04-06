@@ -9,9 +9,9 @@ namespace ContainerWeightlimitSetter.Utility;
 
 public class ContainerProcessor
 {
-    public HashSet<string> Defaultcontainers = [];
+    private HashSet<string> Defaultcontainers = [];
     
-    public ContainerWeightSettings ContainerWeightSettings = Program.ContainerWeightSettings;
+    private ContainerWeightSettings ContainerWeightSettings = Program.ContainerWeightSettings;
     
     public Dictionary<string, float> ContainerMaxWeightDictionary = new ();
     
