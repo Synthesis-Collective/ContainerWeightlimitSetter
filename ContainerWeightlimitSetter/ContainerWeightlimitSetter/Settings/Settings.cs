@@ -13,8 +13,8 @@ namespace ContainerWeightlimitSetter.Settings
     {
 
         [MaintainOrder]
-        [SynthesisDescription("Settings for Handling Container Weights that can't be dynamically determined.")]
-        [SynthesisTooltip("Settings for Handling Container Weights that can't be dynamically determined.")]
+        [SynthesisDescription("Settings for Handling Container Weights Defaults and Custom Weights.")]
+        [SynthesisTooltip("Settings for Handling Container Weights Defaults and Custom Weights.")]
         public ContainerWeightSettings ContainerWeightSettings = new();
         
         [MaintainOrder]
@@ -25,37 +25,7 @@ namespace ContainerWeightlimitSetter.Settings
         [MaintainOrder]
         [SynthesisDescription("Containers that will be ignored by the patcher.")]
         [SynthesisTooltip("Containers that will be ignored by the patcher.")]
-        public HashSet<IFormLinkGetter<IContainerGetter>> IgnoredContainers = new()
-        {
-            /*
-            Skyrim.Container.EvidenceChestPlayerInventory,
-            HearthFires.Container.BYOHHouseVendorChestSmall,
-            HearthFires.Container.BYOHHouseVendorChest,
-            HearthFires.Container.BYOHBYOHApiary,
-            HearthFires.Container.BYOHHouseBarrelFish01_NoRespawn,
-            HearthFires.Container.BYOHHouseUpperEndTable01,
-            HearthFires.Container.BYOHHouseStrongBox,
-            HearthFires.Container.BYOHHouseNobleChestDrawers01,
-            HearthFires.Container.BYOHHouseNobleCupboard02,
-            HearthFires.Container.BYOHHouseNobleWardrobe01,
-            HearthFires.Container.BYOHHouseUpperEndTable02,
-            HearthFires.Container.BYOHHouseNobleCupboard01,
-            HearthFires.Container.BYOHHouseNobleNightTable01,
-            HearthFires.Container.BYOHHouseUpperWardrobe01,
-            HearthFires.Container.BYOHHouseUpperCupboard01,
-            HearthFires.Container.BYOHHouseKnapsack,
-            HearthFires.Container.BYOHHouseNobleChestDrawers02,
-            HearthFires.Container.BYOHHouseSatchel,
-            HearthFires.Container.BYOHHouseUpperDresser01,
-            HearthFires.Container.BYOHHouseNobleChest01,
-            HearthFires.Container.BYOHHouseUpperChest,
-            HearthFires.Container.BYOHPlanterContainer,
-            HearthFires.Container.BYOHHouseSafewithLockPlayer,
-            HearthFires.Container.TreasSatchelEMPTY,
-            HearthFires.Container.BYOHUrchin_SofieChest,
-            HearthFires.Container.BYOHHouseCraftingChest
-            */
-        };
+        public HashSet<IFormLinkGetter<IContainerGetter>> IgnoredContainers = [];
 
     }
 

@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda;
+﻿using ContainerWeightlimitSetter.Settings;
+using Mutagen.Bethesda;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using ContainerWeightlimitSetter.Settings.Enums;
@@ -9,9 +10,8 @@ namespace ContainerWeightlimitSetter.Utility;
 public class ContainerProcessor
 {
     public HashSet<string> Defaultcontainers = [];
-    public HashSet<string> SmallContainers = []; 
-    public HashSet<string> MediumContainers = [];
-    public HashSet<string> LargeContainers = [];
+    
+    public ContainerWeightSettings ContainerWeightSettings = Program.ContainerWeightSettings;
     
     public Dictionary<string, float> ContainerMaxWeightDictionary = new ();
     
@@ -28,7 +28,7 @@ public class ContainerProcessor
     
     public float EstimateWeight(IContainerGetter container)
     {
-        if (container.Items == null || container.Items.Count == 0) return GetContainerClassWeight(container);
+        if (container.Items == null || container.Items.Count == 0) return GetContainerWeightGroupWeight(container);
         
         var maxContainerWeight =  container.Items.Sum(entry => ContainerEntryProcessor.GetMaxEntryWeight(entry));
 
@@ -49,6 +49,10 @@ public class ContainerProcessor
 
         var returnContainerWeight = (float) Math.Ceiling(returnContainerWeightFloat);
         
+        returnContainerWeight = (ContainerWeightSettings.UseCustomWeightIfDynamicWeightIsLower) 
+            ? Math.Max(GetContainerWeightGroupWeight(container,true), returnContainerWeight)
+            : returnContainerWeight;
+        
         returnContainerWeight = Math.Max(Program.WeightGeneratorSettings.MinWeight, returnContainerWeight);
         
         if (container.EditorID != null) ContainerMaxWeightDictionary[container.EditorID] = returnContainerWeight;
@@ -56,30 +60,18 @@ public class ContainerProcessor
         return returnContainerWeight;
     }
     
-    private float GetContainerClassWeight(IContainerGetter container)
+    private float GetContainerWeightGroupWeight(IContainerGetter container,bool ignoreDefaultWeight = false)
     {
-        var containerWeightSettings = Program.ContainerWeightSettings;
+        var weightGroups = ContainerWeightSettings.WeightGroups.Where(group => group.Containers.Count != 0);
 
-        if (containerWeightSettings.SmallContainers.Contains(container))
-        {
-            SmallContainers.Add(container.EditorID!);
-            return containerWeightSettings.SmallContainerWeight;
-        } 
-            
-        if (containerWeightSettings.MediumContainers.Contains(container))
-        {
-            MediumContainers.Add(container.EditorID!);
-            return containerWeightSettings.MediumContainerWeight;
-        }
-            
-        if (containerWeightSettings.LargeContainers.Contains(container))
-        {
-            LargeContainers.Add(container.EditorID!);
-            return containerWeightSettings.LargeContainerWeight;
-        }
+        var containerWeightGroup = weightGroups
+            .Where(group => group.Containers.Select(element => element.FormKey).Contains(container.FormKey))
+            .ToHashSet();
+        
+        if (containerWeightGroup.Count > 0) return containerWeightGroup.First().Weight;
 
         Defaultcontainers.Add(container.EditorID!);
-        return containerWeightSettings.DefaultFallbackWeight;
+        return (ignoreDefaultWeight) ? 0 : ContainerWeightSettings.DefaultFallbackWeight;
     }
     
     public HashSet<FormKey> GetMerchantContainerFormKeys(HashSet<IFactionGetter> factions, ILinkCache linkCache)
