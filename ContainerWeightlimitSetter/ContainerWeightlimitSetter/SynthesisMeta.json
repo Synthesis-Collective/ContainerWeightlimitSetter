@@ -7,6 +7,8 @@
   "RequiredMods": [],
   "TargetedReleases": [
     "SkyrimSE",
-    "SkyrimSEGog"
+    "EnderalSE",
+    "SkyrimSEGog",
+    "EnderalSEGog"
   ]
 }
