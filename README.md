@@ -32,7 +32,7 @@ Companion SKSE plugin (mandatory requirement): https://www.nexusmods.com/skyrims
 - MinWeight (float, default 60) → lower clamp for generated weight.
 
 ### IgnoredContainers
-- HashSet of container form-links. Containers here skipped by patcher.
+- List of container EditorIDs that are skipped by the patcher.
 
 ### SKSEConfigSettings
 
