@@ -7,23 +7,17 @@ using Mutagen.Bethesda.Plugins;
 
 namespace ContainerWeightlimitSetter.Utility;
 
-public class ContainerProcessor
+public class ContainerProcessor(ContainerWeightSettings containerWeightSettings ,WeightGeneratorSettings weightGeneratorSettings, ILinkCache linkCache)
 {
+    private readonly ContainerWeightSettings _containerWeightSettings = containerWeightSettings;
+    private readonly WeightGeneratorSettings _weightGeneratorSettings = weightGeneratorSettings;
+    private readonly ILinkCache _linkCache =  linkCache;
+
     private HashSet<string> Defaultcontainers = [];
-    
-    private ContainerWeightSettings ContainerWeightSettings = Program.ContainerWeightSettings;
     
     public Dictionary<string, float> ContainerMaxWeightDictionary = new ();
     
-    private ContainerEntryProcessor ContainerEntryProcessor;
-    
-    
-
-    public ContainerProcessor(ILinkCache linkCache)
-    {
-        ContainerEntryProcessor = new (linkCache);
-    }
-
+    private ContainerEntryProcessor ContainerEntryProcessor = new (linkCache);
     
     
     public float EstimateWeight(IContainerGetter container)
@@ -49,7 +43,7 @@ public class ContainerProcessor
 
         var returnContainerWeight = (float) Math.Ceiling(returnContainerWeightFloat);
         
-        returnContainerWeight = (ContainerWeightSettings.UseCustomWeightIfDynamicWeightIsLower) 
+        returnContainerWeight = (containerWeightSettings.UseCustomWeightIfDynamicWeightIsLower) 
             ? Math.Max(GetContainerWeightGroupWeight(container,true), returnContainerWeight)
             : returnContainerWeight;
         
@@ -62,7 +56,7 @@ public class ContainerProcessor
     
     private float GetContainerWeightGroupWeight(IContainerGetter container,bool ignoreDefaultWeight = false)
     {
-        var weightGroups = ContainerWeightSettings.WeightGroups.Where(group => group.Containers.Count != 0);
+        var weightGroups = containerWeightSettings.WeightGroups.Where(group => group.Containers.Count != 0);
 
         var containerWeightGroup = weightGroups
             .Where(group => group.Containers.Select(element => element.FormKey).Contains(container.FormKey))
@@ -71,7 +65,7 @@ public class ContainerProcessor
         if (containerWeightGroup.Count > 0) return containerWeightGroup.First().Weight;
 
         Defaultcontainers.Add(container.EditorID!);
-        return (ignoreDefaultWeight) ? 0 : ContainerWeightSettings.DefaultFallbackWeight;
+        return (ignoreDefaultWeight) ? 0 : containerWeightSettings.DefaultFallbackWeight;
     }
     
     public HashSet<FormKey> GetMerchantContainerFormKeys(HashSet<IFactionGetter> factions, ILinkCache linkCache)

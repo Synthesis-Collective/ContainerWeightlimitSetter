@@ -6,12 +6,12 @@ namespace ContainerWeightlimitSetter.Utility;
 
 public class ContainerEntryProcessor(ILinkCache linkCache)
 {
-    private Dictionary<FormKey, float> ContainerItemMaxWeightCache = new ();
-    private FormKey entryPointFormKey;
+    private readonly Dictionary<FormKey, float> _containerItemMaxWeightCache = new ();
+    private FormKey _entryPointFormKey;
 
     private float GetItemWeight(FormKey itemFormKey)
     {
-        if (ContainerItemMaxWeightCache.TryGetValue(itemFormKey, out var maxEntryWeight)) return maxEntryWeight;
+        if (_containerItemMaxWeightCache.TryGetValue(itemFormKey, out var maxEntryWeight)) return maxEntryWeight;
         
         if (linkCache.TryResolve<ILeveledItemGetter>(itemFormKey, out var leveledItemGetter))
         {
@@ -20,7 +20,7 @@ public class ContainerEntryProcessor(ILinkCache linkCache)
             return leveledItemGetter.Entries.Max(leveledItemEntry =>
             {
                 var leveledListMaxWeight = leveledItemEntry.Data == null ? 0f :  GetItemWeight(leveledItemEntry.Data.Reference.FormKey);
-                if (leveledItemEntry.Data != null) ContainerItemMaxWeightCache[leveledItemEntry.Data.Reference.FormKey] = leveledListMaxWeight;
+                if (leveledItemEntry.Data != null) _containerItemMaxWeightCache[leveledItemEntry.Data.Reference.FormKey] = leveledListMaxWeight;
                 return leveledListMaxWeight;
             });
         }
@@ -32,73 +32,73 @@ public class ContainerEntryProcessor(ILinkCache linkCache)
 
         if (linkCache.TryResolve<IAmmunitionGetter>(itemFormKey, out var ammunitionGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = ammunitionGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = ammunitionGetter.Weight;
             return ammunitionGetter.Weight;
         }
 
         if (linkCache.TryResolve<IArmorGetter>(itemFormKey, out var armorGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = armorGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = armorGetter.Weight;
             return armorGetter.Weight;
         }
 
         if (linkCache.TryResolve<IBookGetter>(itemFormKey, out var bookGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = bookGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = bookGetter.Weight;
             return bookGetter.Weight;
         }
 
         if (linkCache.TryResolve<IContainerGetter>(itemFormKey, out var containerGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = containerGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = containerGetter.Weight;
             return containerGetter.Weight;
         }
 
         if (linkCache.TryResolve<IIngestibleGetter>(itemFormKey, out var ingestibleGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = ingestibleGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = ingestibleGetter.Weight;
             return ingestibleGetter.Weight;
         }
 
         if (linkCache.TryResolve<IIngredientGetter>(itemFormKey, out var ingredientGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = ingredientGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = ingredientGetter.Weight;
             return ingredientGetter.Weight;
         }
 
         if (linkCache.TryResolve<IKeyGetter>(itemFormKey, out var keyGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = keyGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = keyGetter.Weight;
             return keyGetter.Weight;
         }
 
         if (linkCache.TryResolve<ILightGetter>(itemFormKey, out var lightGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = lightGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = lightGetter.Weight;
             return lightGetter.Weight;
         }
 
         if (linkCache.TryResolve<IMiscItemGetter>(itemFormKey, out var miscItemGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = miscItemGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = miscItemGetter.Weight;
             return miscItemGetter.Weight;
         }
 
         if (linkCache.TryResolve<IScrollGetter>(itemFormKey, out var scrollGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = scrollGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = scrollGetter.Weight;
             return scrollGetter.Weight;
         }
 
         if (linkCache.TryResolve<ISoulGemGetter>(itemFormKey, out var soulGemGetter))
         {
-            ContainerItemMaxWeightCache[itemFormKey] = soulGemGetter.Weight;
+            _containerItemMaxWeightCache[itemFormKey] = soulGemGetter.Weight;
             return soulGemGetter.Weight;
         }
 
         if (!linkCache.TryResolve<IWeaponGetter>(itemFormKey, out var weaponGetter)) return 0f;
         if (weaponGetter.BasicStats == null) return 0f;
-        ContainerItemMaxWeightCache[itemFormKey] = weaponGetter.BasicStats.Weight;
+        _containerItemMaxWeightCache[itemFormKey] = weaponGetter.BasicStats.Weight;
         
         return 0f;
         
@@ -106,8 +106,8 @@ public class ContainerEntryProcessor(ILinkCache linkCache)
 
     public float GetMaxEntryWeight(IContainerEntryGetter containerEntry)
     {
-        entryPointFormKey = containerEntry.Item.Item.FormKey;
-        var itemWeight = GetItemWeight(entryPointFormKey);
+        _entryPointFormKey = containerEntry.Item.Item.FormKey;
+        var itemWeight = GetItemWeight(_entryPointFormKey);
         var itemCount = containerEntry.Item.Count;
         
         var maxEntryWeight = itemWeight * itemCount;

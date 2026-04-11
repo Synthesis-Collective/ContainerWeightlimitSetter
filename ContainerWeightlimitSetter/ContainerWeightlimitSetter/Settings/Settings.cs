@@ -1,4 +1,5 @@
 ﻿using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Synthesis.Settings;
 using Mutagen.Bethesda.WPF.Reflection.Attributes;
@@ -26,6 +27,10 @@ namespace ContainerWeightlimitSetter.Settings
         [SynthesisDescription("Containers that will be ignored by the patcher.")]
         [SynthesisTooltip("Containers that will be ignored by the patcher.")]
         public HashSet<IFormLinkGetter<IContainerGetter>> IgnoredContainers = [];
+        
+        [MaintainOrder]
+        [SynthesisDescription("Settings Generator GUI for the SKSE Plugin")]
+        public SKSEConfigSettings SKSEConfigSettings = new();
 
     }
 

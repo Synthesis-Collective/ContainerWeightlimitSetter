@@ -21,9 +21,7 @@ public class ContainerWeightSettings
     [SynthesisDescription("Custom Weights for Configurable Containers.")]
     public HashSet<WeightGroup> WeightGroups = new ()
     {
-        new WeightGroup(100,[
-            Skyrim.Container.NobleWardrobe01
-        ]),
+        new WeightGroup(100,[]),
         new WeightGroup(300,[]),
         new WeightGroup(1200,[]),
     };

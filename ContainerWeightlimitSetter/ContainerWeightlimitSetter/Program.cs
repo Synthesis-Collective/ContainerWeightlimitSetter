@@ -24,11 +24,14 @@ namespace ContainerWeightlimitSetter
         private const string VendorChestMarker = "Vendor";
         private const string MerchantChestMarker = "Merchant";
         
-        public static Settings.ContainerWeightSettings ContainerWeightSettings => Settings.ContainerWeightSettings;
+        public static ContainerWeightSettings ContainerWeightSettings => Settings.ContainerWeightSettings;
         
         public static WeightGeneratorSettings WeightGeneratorSettings => Settings.WeightGeneratorSettings;
 
         public static HashSet<IFormLinkGetter<IContainerGetter>>  IgnoredContainers => Settings.IgnoredContainers;
+        
+        // ReSharper disable once InconsistentNaming
+        private static SKSEConfigSettings skseConfigSettings => Settings.SKSEConfigSettings;
         
         public static async Task<int> Main(string[] args)
         {
@@ -48,8 +51,8 @@ namespace ContainerWeightlimitSetter
 
         public static void RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state)
         {
-            SkseExports skseExports = new();
-            ContainerProcessor containerProcessor = new(state.LinkCache);
+            LoggingExports loggingExports = new(ContainerWeightSettings);
+            ContainerProcessor containerProcessor = new(ContainerWeightSettings ,WeightGeneratorSettings, state.LinkCache);
             
             var merchantFactions = state.LoadOrder.PriorityOrder.Faction().WinningOverrides()
                 .Where(faction => !faction.MerchantContainer.IsNull).ToHashSet();
@@ -65,7 +68,7 @@ namespace ContainerWeightlimitSetter
                                     && !container.EditorID
                                         .Contains(MerchantChestMarker, StringComparison.OrdinalIgnoreCase)
                                     && !merchantContainers.Contains(container.FormKey)
-                                    && !skseExports.ExportedIgnoredContainerEditorId(container)
+                                    && !loggingExports.ExportedIgnoredContainerEditorId(container)
                                     && (container.VirtualMachineAdapter?.Scripts.Count ?? 0) == 0 
                                     )
                 .Select(container => container.DeepCopy())
@@ -83,18 +86,15 @@ namespace ContainerWeightlimitSetter
             });
             
             
-            
-            var skseExportsJson
-                = JsonConvert.SerializeObject(skseExports,Formatting.Indented);
+            var loggingExportsJson
+                = JsonConvert.SerializeObject(loggingExports,Formatting.Indented);
             
             var staticallyProcessedContainers
                 = JsonConvert.SerializeObject(containerProcessor,Formatting.Indented);
-
-            //TODO: Implement JSON Export for SKSE Plugin Configuration stuff // Maybe ?
             
-            skseExports.ExportWeightGroups(state.LinkCache);
+            loggingExports.ExportWeightGroups(state.LinkCache);
             
-            Console.WriteLine(skseExportsJson);
+            Console.WriteLine(loggingExportsJson);
             Console.WriteLine(staticallyProcessedContainers);
 
             var maxGeneratedWeight =  containerProcessor.ContainerMaxWeightDictionary.Max(entry => entry.Value);
@@ -104,6 +104,23 @@ namespace ContainerWeightlimitSetter
             Console.WriteLine($"Min Generated Weight: {minGeneratedWeight}");
             Console.WriteLine($"Average Generated Weight: {averageGeneratedWeight}");
 
+
+            if (!skseConfigSettings.ExportSKSEConfig) return;
+            var skseJsonExportString = JsonConvert.SerializeObject(
+                new ExportForSKSE(skseConfigSettings,state.LinkCache),Formatting.Indented);
+            Console.WriteLine($"Exporting SKSE config to SKSE plugin");
+            var skseExcludesJsonFilePath = Path.Combine(state.DataFolderPath, new RelativePath("SKSE/Plugins/synthesis-container-weight-exclusions.json").ToNativeSeparators(OSInformation.FromCurrentRuntime()));
+            Console.WriteLine($"Exporting SKSE configuration to \"{skseExcludesJsonFilePath}\"");
+            try
+            {
+                File.WriteAllText(skseExcludesJsonFilePath, skseJsonExportString);
+                Console.WriteLine("SKSE configuration exported successfully");
+            } catch (Exception e)
+            {
+                Console.WriteLine("Failed to export SKSE configuration");
+                Console.WriteLine(e.Message);
+            }
+            
         }
         
         public static void CheckRunnability(IRunnabilityState state)

@@ -1,13 +1,14 @@
-﻿using Mutagen.Bethesda;
+﻿using ContainerWeightlimitSetter.Settings;
+using Mutagen.Bethesda;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 // ReSharper disable UnusedMember.Global
 
 namespace ContainerWeightlimitSetter.Utility;
 
-public class SkseExports
+public class LoggingExports(ContainerWeightSettings containerWeightSettings)
 {
-
+    
     public readonly HashSet<string> IgnoredContainers = [];
     public HashSet<ReadableWeightGroup> weightGroups = [];
     
@@ -22,7 +23,7 @@ public class SkseExports
 
     public void ExportWeightGroups(ILinkCache linkCache)
     {
-        weightGroups.UnionWith(Program.ContainerWeightSettings.WeightGroups.Select(group =>
+        weightGroups.UnionWith(containerWeightSettings.WeightGroups.Select(group =>
         {
             return new ReadableWeightGroup(group.Weight,
                 group.Containers.Select(container =>
