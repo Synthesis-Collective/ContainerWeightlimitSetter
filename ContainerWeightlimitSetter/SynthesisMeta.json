@@ -1,6 +1,6 @@
 {
   "Nickname": "Container Weightlimit Setter",
-  "Visibility": "Exclude",
+  "Visibility": "Visible",
   "OneLineDescription": "Set Container weight limits for Skyrim SE via Synthesis. ",
   "LongDescription": "Patch generates game records that set the weight field of container to be used by the [Companion SKSE Plugin](https://www.nexusmods.com/skyrimspecialedition/mods/176627) \r\nAnd it generates an optional SKSE config where the patcher mostly acts as a visual GUI to make the changes.\r\n\r\nCompanion SKSE plugin (mandatory requirement): https://www.nexusmods.com/skyrimspecialedition/mods/176627\r\n\r\nYou can find more info about this on the Github Page or the SKSE mods nexus page description.",
   "PreferredAutoVersioning": "LatestTag",
